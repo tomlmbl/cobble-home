@@ -41,14 +41,19 @@ screen. Automatic switching can be turned off.
 
 No account, analytics, advertising ID, crash reporting or telemetry. Data stays in the app's private storage.
 
+**Asked only when you use the feature**
+
 - **Location (precise):** Android only gives the name of the connected Wi-Fi to apps with this permission. Used to
   recognize saved networks; names never leave the phone. Asked when you turn on automatic switching.
 - **Location (approximate):** *Use my location* for the weather picks the nearest city from a built-in list. Your
-  position is not stored or sent. Asked when you tap *Use my location*.
+  position is not stored or sent. Asked when you tap it.
 - **Calendar:** shows your next event. Events are not stored. Asked when you tap the calendar button in the panel.
-- **Internet:** weather from [Open-Meteo](https://open-meteo.com/), off until you pick a city. Granted at install.
+
+**Granted at install**
+
+- **Internet:** weather from [Open-Meteo](https://open-meteo.com/), off until you pick a city.
 - **Network and Wi-Fi state, expand status bar, request uninstall:** Wi-Fi connection changes, notification shade,
-  *Uninstall* in an app's menu. Granted at install.
+  *Uninstall* in an app's menu.
 
 Refusing a permission only disables the feature that needs it. Details and data sent to Open-Meteo:
 [PRIVACY.md](PRIVACY.md).
