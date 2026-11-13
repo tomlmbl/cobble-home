@@ -59,6 +59,8 @@ class UnlockArrival(
     val staggerMs: Int,
     val startDelayMs: Long,
     val easing: Easing,
+    /** Height of the common scale center, as a fraction of the screen height, horizontally centered. */
+    val pivotY: Float,
 ) {
     /** Progress (0 hidden, 1 in place) of the element of [rank], [elapsedMs] after the sequence starts. */
     fun progress(elapsedMs: Float, rank: Int): Float =
@@ -69,16 +71,17 @@ class UnlockArrival(
 }
 
 /**
- * Opacity and scale of one element from its arrival [progress]. Every element scales around the center of the screen,
- * so that together they read as a single zoom rather than each growing in place. The scale is applied at draw time
+ * Opacity and scale of one element from its arrival [progress]. Every element scales around the same point near the
+ * bottom of the screen ([UnlockArrival.pivotY]), so that together they read as a single zoom rising from where the
+ * unlock happens, rather than each growing in place. The scale is applied at draw time
  * only: layout, hence the bounds given to the gesture return, stays the final one.
  */
 internal fun Modifier.arrive(spec: UnlockArrival, progress: () -> Float): Modifier = composed {
-    // Screen center in the element's own coordinates.
+    // Common scale center in the element's own coordinates.
     var pivot by remember { mutableStateOf<Offset?>(null) }
     onGloballyPositioned { coordinates ->
         val root = coordinates.findRootCoordinates()
-        pivot = coordinates.localPositionOf(root, Offset(root.size.width / 2f, root.size.height / 2f))
+        pivot = coordinates.localPositionOf(root, Offset(root.size.width / 2f, root.size.height * spec.pivotY))
     }
         .graphicsLayer { alpha = (progress() * spec.durationMs / spec.alphaMs).coerceIn(0f, 1f) }
         .drawWithContent {

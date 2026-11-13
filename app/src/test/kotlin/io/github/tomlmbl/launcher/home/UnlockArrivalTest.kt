@@ -52,7 +52,7 @@ class UnlockArrivalTest {
         assertFalse(watch.onStart(deviceLocked = false, keyguardLocked = true))
     }
 
-    private val spec = UnlockArrival(durationMs = 800, startScale = 0.9f, alphaMs = 200, staggerMs = 25, startDelayMs = 50, easing = LinearEasing)
+    private val spec = UnlockArrival(durationMs = 800, startScale = 0.9f, alphaMs = 200, staggerMs = 25, startDelayMs = 50, easing = LinearEasing, pivotY = 0.9f)
 
     @Test
     fun elementsStartFromTheBottomOneAfterAnother() {
