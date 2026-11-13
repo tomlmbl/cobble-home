@@ -586,7 +586,7 @@ object Tokens {
      */
     val unlockArrival = io.github.tomlmbl.launcher.home.UnlockArrival(
         durationMs = 800, startScale = 0.9f, alphaMs = 200, staggerMs = 25, startDelayMs = 50,
-        easing = gestureRevealEasing, pivotY = 0.9f,
+        easing = gestureRevealEasing, pivotY = 0.9f, unlockWaitMs = 500,
     )
     /** Most elements ranked by the unlock arrival: dock, "Search apps", six favorites, event, date line, clock. */
     const val unlockArrivalRanks = 11

@@ -17,35 +17,26 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.util.lerp
 
 /**
- * Tells an unlock apart from other returns to Home, without permission, from the keyguard state read at each stop and
- * start. Measured on one Android 16 device: Home is stopped only once the keyguard shows, then started again once the
- * device is unlocked, while the keyguard still reports itself as locked during SystemUI's exit animation (about 400 ms).
+ * Whether Home, started while the keyguard is still there, arrives from an unlock. Measured on Android 16 and 17: when
+ * Home starts during an unlock, the keyguard still reports itself as locked for SystemUI's exit animation (about
+ * 400 ms), while an ordinary return finds it gone; the device itself may report itself locked for a few more ms. Home
+ * started behind the keyguard (camera opened over it) stays locked.
  */
-class UnlockWatch {
-    private var lockedSinceStop = false
+enum class UnlockGate {
+    /** Not decided yet: look again at the next frame. */
+    Wait,
+    /** The device is unlocked: play the arrival. */
+    Arrive,
+    /** Still locked after [UnlockArrival.unlockWaitMs]: Home is behind the keyguard, show it as is. */
+    Show;
 
-    /**
-     * [keyguardLocked]: the keyguard covered Home when it stopped. Never cleared here: Home may start and stop again
-     * behind the keyguard (camera opened over it).
-     */
-    fun onStop(keyguardLocked: Boolean) {
-        if (keyguardLocked) lockedSinceStop = true
+    companion object {
+        fun of(elapsedMs: Long, deviceLocked: Boolean, spec: UnlockArrival): UnlockGate = when {
+            !deviceLocked -> Arrive
+            elapsedMs >= spec.unlockWaitMs -> Show
+            else -> Wait
+        }
     }
-
-    /**
-     * Whether Home arrives from an unlock. Still locked ([deviceLocked]): Home is hidden, nothing is decided.
-     * Otherwise the keyguard must still be leaving ([keyguardLocked]): unlocking straight into an app and coming back
-     * later is an ordinary return.
-     */
-    fun onStart(deviceLocked: Boolean, keyguardLocked: Boolean): Boolean {
-        if (deviceLocked) return false
-        val arrive = lockedSinceStop && keyguardLocked
-        lockedSinceStop = false
-        return arrive
-    }
-
-    /** Pending unlock, for the log. */
-    val pending: Boolean get() = lockedSinceStop
 }
 
 /**
@@ -62,6 +53,8 @@ class UnlockArrival(
     val easing: Easing,
     /** Height of the common scale center, as a fraction of the screen height, horizontally centered. */
     val pivotY: Float,
+    /** Longest wait, from Home's start, for the device to report itself unlocked. */
+    val unlockWaitMs: Long,
 ) {
     /** Progress (0 hidden, 1 in place) of the element of [rank], [elapsedMs] after the sequence starts. */
     fun progress(elapsedMs: Float, rank: Int): Float =

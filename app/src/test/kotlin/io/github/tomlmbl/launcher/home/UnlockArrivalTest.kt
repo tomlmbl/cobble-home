@@ -2,57 +2,26 @@ package io.github.tomlmbl.launcher.home
 
 import androidx.compose.animation.core.LinearEasing
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class UnlockArrivalTest {
 
+    private val spec = UnlockArrival(durationMs = 800, startScale = 0.9f, alphaMs = 200, staggerMs = 25, startDelayMs = 50, easing = LinearEasing, pivotY = 0.9f, unlockWaitMs = 500)
+
     @Test
-    fun unlockToHomeArrives() {
-        val watch = UnlockWatch()
-        watch.onStop(keyguardLocked = true)
-        assertTrue(watch.onStart(deviceLocked = false, keyguardLocked = true))
+    fun unlockedDeviceArrives() {
+        assertEquals(UnlockGate.Arrive, UnlockGate.of(50, deviceLocked = false, spec))
+        assertEquals(UnlockGate.Arrive, UnlockGate.of(900, deviceLocked = false, spec))
     }
 
     @Test
-    fun ordinaryReturnDoesNotArrive() {
-        val watch = UnlockWatch()
-        watch.onStop(keyguardLocked = false)
-        assertFalse(watch.onStart(deviceLocked = false, keyguardLocked = false))
+    fun stillLockedWaitsThenShows() {
+        // The device may still report itself locked for a few ms after the keyguard starts leaving.
+        assertEquals(UnlockGate.Wait, UnlockGate.of(50, deviceLocked = true, spec))
+        assertEquals(UnlockGate.Wait, UnlockGate.of(499, deviceLocked = true, spec))
+        // Home behind the keyguard (camera opened over it): shown as is.
+        assertEquals(UnlockGate.Show, UnlockGate.of(500, deviceLocked = true, spec))
     }
-
-    @Test
-    fun startBehindTheKeyguardKeepsTheUnlockForLater() {
-        // Camera opened over the keyguard, then the Home gesture: Home starts and stops behind it before the unlock.
-        val watch = UnlockWatch()
-        watch.onStop(keyguardLocked = true)
-        assertFalse(watch.onStart(deviceLocked = true, keyguardLocked = true))
-        watch.onStop(keyguardLocked = true)
-        assertTrue(watch.onStart(deviceLocked = false, keyguardLocked = true))
-    }
-
-    @Test
-    fun unlockIntoAnAppThenLaterReturnIsOrdinary() {
-        val watch = UnlockWatch()
-        watch.onStop(keyguardLocked = true)
-        // Unlocked straight into an app: back to Home long after, the keyguard is gone.
-        assertFalse(watch.onStart(deviceLocked = false, keyguardLocked = false))
-        // The pending unlock is consumed.
-        watch.onStop(keyguardLocked = false)
-        assertFalse(watch.onStart(deviceLocked = false, keyguardLocked = true))
-    }
-
-    @Test
-    fun arrivalIsConsumedOnce() {
-        val watch = UnlockWatch()
-        watch.onStop(keyguardLocked = true)
-        assertTrue(watch.onStart(deviceLocked = false, keyguardLocked = true))
-        watch.onStop(keyguardLocked = false)
-        assertFalse(watch.onStart(deviceLocked = false, keyguardLocked = true))
-    }
-
-    private val spec = UnlockArrival(durationMs = 800, startScale = 0.9f, alphaMs = 200, staggerMs = 25, startDelayMs = 50, easing = LinearEasing, pivotY = 0.9f)
 
     @Test
     fun elementsStartFromTheBottomOneAfterAnother() {
