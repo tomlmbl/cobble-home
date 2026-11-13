@@ -13,7 +13,7 @@ android {
         minSdk = 35
         targetSdk = 37
         versionCode = 1
-        versionName = "0.1.0-dev"
+        versionName = "1.0.0"
     }
 
     // Release key outside the repository: read from the environment at build time; without it, the release stays

@@ -1,0 +1,7 @@
+First public beta.
+
+- Home screen: clock, weather, next calendar event, up to six favorites in your order, search line.
+- All apps: text search and a one-thumb alphabet slider.
+- Profiles: none, or three, each with a three-app dock. Switch by hand or from saved Wi-Fi networks, never while you use the screen.
+- Works without network or optional permissions.
+- No tracking, no analytics, no telemetry.

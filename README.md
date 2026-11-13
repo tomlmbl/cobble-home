@@ -72,6 +72,11 @@ Requires JDK 21 and the Android SDK.
 
 Release builds are reproducible: verification steps are in [REPRODUCIBLE_BUILDS.md](REPRODUCIBLE_BUILDS.md).
 
+## Contributing
+
+Bug reports and suggestions are welcome as [issues](https://github.com/tomlmbl/cobble-home/issues).
+Please open an issue before starting work on a pull request.
+
 ## License
 
 Cobble Home is free software under the [GNU General Public License v3.0 or later](LICENSE)
