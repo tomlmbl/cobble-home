@@ -1,5 +1,6 @@
 package io.github.tomlmbl.launcher.home
 
+import android.app.KeyguardManager
 import android.app.role.RoleManager
 import android.animation.ValueAnimator
 import android.content.BroadcastReceiver
@@ -9,6 +10,7 @@ import android.content.IntentFilter
 import android.graphics.Color as AndroidColor
 import android.graphics.Rect
 import android.os.Bundle
+import android.util.Log
 import android.view.InputDevice
 import android.view.MotionEvent
 import android.view.WindowManager
@@ -126,6 +128,7 @@ import io.github.tomlmbl.launcher.ui.SheetRow
 import io.github.tomlmbl.launcher.ui.SheetSection
 import io.github.tomlmbl.launcher.ui.Tokens
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -189,6 +192,13 @@ class HomeActivity : ComponentActivity() {
      * under the contract's surface; otherwise the center of Home.
      */
     private var revealPivot by mutableStateOf<Offset?>(null)
+    private val unlockWatch = UnlockWatch()
+    /**
+     * Unlock arrival: time elapsed in the sequence, in ms; past its end, every element is in place. Played in
+     * composition at each [arrivalRun].
+     */
+    private val arrival = Animatable(ARRIVAL_DONE)
+    private var arrivalRun by mutableIntStateOf(0)
     private var screen by mutableStateOf<Screen>(Screen.Home)
     /** Current catalog entry: search only from below, catalog from the side, or the original entry. */
     private var catalogEntry by mutableStateOf(CatalogEntry.Up)
@@ -367,6 +377,16 @@ class HomeActivity : ComponentActivity() {
                 // would double-expose the blurred background); the back transition plays on commit, from the shrunk
                 // screen. Cancelled, the screen returns to its size.
                 LaunchedEffect(revealRun) { reveal.animateTo(revealTarget, tween(revealSpec.durationMs, easing = LinearEasing)) }
+                LaunchedEffect(arrivalRun) {
+                    if (arrivalRun == 0) return@LaunchedEffect
+                    val spec = Tokens.unlockArrival
+                    delay(spec.startDelayMs)
+                    // Home stopped during the delay: the sequence was cancelled.
+                    if (arrival.value != 0f) return@LaunchedEffect
+                    val total = spec.totalMs(Tokens.unlockArrivalRanks)
+                    arrival.animateTo(total.toFloat(), tween(total, easing = LinearEasing))
+                    arrival.snapTo(ARRIVAL_DONE)
+                }
                 val pages = remember { SeekableTransitionState(page) }
                 // Screen closed while Home was stopped (app open, Home gesture): without a transition, the window comes
                 // straight back to Home, which plays its reveal.
@@ -582,6 +602,7 @@ class HomeActivity : ComponentActivity() {
                         onOpenSearch = if (list == null) null else { { catalogReady = true; openSearch() } },
                         contentAlpha = { CatalogMotion.homeAlpha(deck.progress.value, catalogEntry) },
                         contentOffset = { CatalogMotion.homeOffset(deck.progress.value, coursePx, catalogEntry) },
+                        arrival = { rank -> Tokens.unlockArrival.progress(arrival.value, rank) },
                     )
                     // Home inert under the catalog (no touch goes through); while closing it becomes live again:
                     // dragging reopens it.
@@ -876,6 +897,22 @@ class HomeActivity : ComponentActivity() {
         // Back from an app (gesture, button, app exit) or screen wake-up: Home plays its reveal.
         revealTarget = 1f
         revealRun++
+        // After an unlock, Home's elements arrive one by one instead of the reveal; with reduced animations, Home shows
+        // at once.
+        val keyguard = getSystemService(KeyguardManager::class.java)
+        val deviceLocked = keyguard.isDeviceLocked
+        val keyguardLocked = keyguard.isKeyguardLocked
+        val pending = unlockWatch.pending
+        val unlocked = unlockWatch.onStart(deviceLocked, keyguardLocked)
+        // States only: makes the trigger checkable on devices whose keyguard timing differs.
+        if (pending || keyguardLocked) Log.i("Unlock", "deviceLocked=$deviceLocked keyguardLocked=$keyguardLocked pending=$pending arrival=$unlocked")
+        if (unlocked && ValueAnimator.areAnimatorsEnabled()) {
+            lifecycleScope.launch {
+                reveal.snapTo(1f)
+                arrival.snapTo(0f)
+            }
+            arrivalRun++
+        }
         refreshRole()
         // Wi-Fi is read right now: an already stable connection switches before display.
         autoSwitch.visible(true)
@@ -898,7 +935,11 @@ class HomeActivity : ComponentActivity() {
 
     override fun onStop() {
         super.onStop()
-        lifecycleScope.launch { reveal.snapTo(0f) }
+        unlockWatch.onStop(getSystemService(KeyguardManager::class.java).isKeyguardLocked)
+        lifecycleScope.launch {
+            reveal.snapTo(0f)
+            arrival.snapTo(ARRIVAL_DONE)
+        }
         // Reveal for the button or app exit; a gesture return replaces it in onNewIntent.
         revealSpec = Tokens.homeReveal
         revealPivot = null
@@ -1000,6 +1041,8 @@ class HomeActivity : ComponentActivity() {
         const val KEY_STEP = "onboarding.step"
         const val KEY_PROFILES = "onboarding.profiles"
         const val KEY_FAVORITES = "onboarding.favorites"
+        /** Unlock arrival over: every element in place. */
+        const val ARRIVAL_DONE = Float.MAX_VALUE
     }
 }
 

@@ -172,7 +172,11 @@ fun HomeScreen(
     contentOffset: () -> Float = { 0f },
     /** Changes at each return Home (Home button, screen off): the open menu closes. */
     menuReset: Int = 0,
+    /** Unlock arrival progress of the element of a rank, from the bottom (0) upward: 1 in place. */
+    arrival: (Int) -> Float = { 1f },
 ) {
+    val arrivalSpec = Tokens.unlockArrival
+    fun Modifier.arriving(rank: Int) = arrive(arrivalSpec) { arrival(rank) }
     val visible by animateFloatAsState(
         if (faded) 0f else 1f,
         if (faded) tween(Tokens.homeFadeOutMs, easing = Tokens.fadeOutEasing) else tween(Tokens.homeFadeInMs, easing = Tokens.fadeInEasing),
@@ -275,26 +279,31 @@ fun HomeScreen(
                 val rowFloor = rowPx.coerceAtLeast(minRowPx)
                 val capacity = favoriteCapacity(capacityHeight(constraints.maxHeight.toFloat(), docked, freedPx) - searchRows * rowFloor, clockPx + datePx + eventLinePx, gapsPx, rowFloor)
                 if (slots != null) {
+                    // Arrival ranks from the bottom: dock as one block, "Search apps", favorites from the last, event,
+                    // date line, clock.
+                    val shownCount = if (slots.isEmpty()) 1 else slots.size.coerceAtMost(capacity)
+                    val listBase = (if (docked) 1 else 0) + searchRows
+                    val eventRank = listBase + shownCount
                     LaunchedEffect(capacity) { onCapacity(capacity) }
                     // Favorites beyond the maximum: kept but not shown; logged.
                     LaunchedEffect(capacity, slots.size) { if (slots.size > capacity) Log.i("Config", "shown $capacity of ${slots.size}") }
                     Column(Modifier.fillMaxWidth().padding(bottom = Tokens.favoritesToDock)) {
                         Column(Modifier.padding(horizontal = Tokens.screenMargin)) {
-                            Column(Modifier.onSizeChanged { clockPx = it.height }) {
+                            Column(Modifier.onSizeChanged { clockPx = it.height }.arriving(eventRank + 2)) {
                                 Clock(now, clockFont, fg, shadow, onOpenClock)
                                 Spacer(Modifier.height(Tokens.Space.xs))
                             }
                             // Date, weather and event: a single area, at least 48 dp, overflowing onto the gap with the
                             // favorites rather than moving them (like the indicator).
                             GlanceZone(onOpenPanel, onContentHeight = { zoneContentPx = it }) {
-                                DateLine(now, weather, modifier = Modifier.onSizeChanged { datePx = it.height })
-                                EventLine(now, event, modifier = Modifier.padding(top = Tokens.Space.xs))
+                                DateLine(now, weather, modifier = Modifier.onSizeChanged { datePx = it.height }.arriving(eventRank + 1))
+                                EventLine(now, event, modifier = Modifier.padding(top = Tokens.Space.xs).arriving(eventRank))
                             }
                         }
                         val overflow = with(density) { (Tokens.touchTarget.roundToPx() - zoneContentPx).coerceAtLeast(0).toDp() }
                         Spacer(Modifier.height(Tokens.clockToFavorites - overflow))
                         if (slots.isEmpty()) {
-                            ChooseFavorites(fg, shadow, onChooseFavorites)
+                            Box(Modifier.arriving(listBase)) { ChooseFavorites(fg, shadow, onChooseFavorites) }
                         } else {
                             val shown = slots.take(capacity)
                             Column(
@@ -306,12 +315,14 @@ fun HomeScreen(
                                 shown.forEachIndexed { i, slot ->
                                     val surface = Tokens.favoriteShape(first = i == 0, last = i == shown.lastIndex && searchRows == 0)
                                     val radii = Tokens.favoriteRadii(first = i == 0, last = i == shown.lastIndex && searchRows == 0)
+                                    val arriving = Modifier.arriving(listBase + shown.lastIndex - i)
                                     when (slot) {
                                         is FavoriteSlot.Installed -> FavoriteRow(
                                             slot.app.label, fg, shadow, appId = slot.app.id, dot = { rememberDot(slot.app, color) }, paused = slot.app.paused, surface = surface, radii = radii,
                                             otherProfile = slot.app.otherProfile, description = slot.app.description,
                                             onClick = { bounds -> onLaunch(slot.app, bounds) },
                                             onLongClick = { onAppMenu(slot.app) },
+                                            modifier = arriving,
                                         )
                                         is FavoriteSlot.Missing -> FavoriteRow(
                                             slot.favorite.label, fg, shadow, dot = { Tokens.dotNeutral }, missing = true, surface = surface, radii = radii,
@@ -323,6 +334,7 @@ fun HomeScreen(
                                                 )
                                             },
                                             onLongClick = { at -> menu = at to listOf(MenuItem(editLabel, R.drawable.ic_edit, onEditFavorites)) },
+                                            modifier = arriving,
                                         )
                                     }
                                 }
@@ -335,6 +347,7 @@ fun HomeScreen(
                                     withContact = false,
                                     onClick = { _ -> onOpenSearch() },
                                     onLongClick = { at -> menu = at to homeMenu },
+                                    modifier = Modifier.arriving(listBase - 1),
                                 )
                             }
                         }
@@ -347,7 +360,7 @@ fun HomeScreen(
                 if (profile != null && dock != null && installed != null) {
                     // Hidden while the slot picker shows its preview, which leaves from here and comes back here.
                     Column(
-                        Modifier.padding(bottom = Tokens.indicatorBottom).graphicsLayer { alpha = if (dockAnchor.lifted) 0f else 1f },
+                        Modifier.padding(bottom = Tokens.indicatorBottom).graphicsLayer { alpha = if (dockAnchor.lifted) 0f else 1f }.arriving(0),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         // On any profile change, manual or signal-driven, the icons change slot by slot, from left
@@ -517,6 +530,7 @@ private fun FavoriteRow(
     label: String,
     fg: Color,
     shadow: androidx.compose.ui.graphics.Shadow?,
+    modifier: Modifier = Modifier,
     appId: String? = null,
     dot: @Composable () -> Color?,
     missing: Boolean = false,
@@ -547,7 +561,7 @@ private fun FavoriteRow(
     // The full width is tappable; a long press on the background stays possible in the empty top.
     // The launch animation starts from the dot and the name, not the whole row.
     Row(
-        Modifier
+        modifier
             .fillMaxWidth()
             .heightIn(min = Tokens.favoriteRowHeight - Tokens.favoritesGroupGap)
             .combinedClickable(

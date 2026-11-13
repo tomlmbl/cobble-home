@@ -577,6 +577,18 @@ object Tokens {
         blurMs = 500,
         blurEasing = CubicBezierEasing(0.4f, 0f, 0.2f, 1f),
     )
+    /**
+     * Unlock: Home's elements arrive one by one from the bottom, in the spirit of the Pixel launcher's unlock (opacity
+     * and scale per element, staggered); starting values, to tune by hand: [gestureRevealEasing] in 800 ms from 0.9,
+     * opacity in 200 ms, 25 ms between elements. Starts 50 ms after Home starts, about when SystemUI begins its own
+     * fade and rise of Home (30 to 55 ms, measured on one Android 16 device).
+     */
+    val unlockArrival = io.github.tomlmbl.launcher.home.UnlockArrival(
+        durationMs = 800, startScale = 0.9f, alphaMs = 200, staggerMs = 25, startDelayMs = 50,
+        easing = gestureRevealEasing,
+    )
+    /** Most elements ranked by the unlock arrival: dock, "Search apps", six favorites, event, date line, clock. */
+    const val unlockArrivalRanks = 11
     /** Predictive back of a full-screen page: maximum shrink, around the middle of the screen. */
     const val predictiveBackScale = 0.9f
 
