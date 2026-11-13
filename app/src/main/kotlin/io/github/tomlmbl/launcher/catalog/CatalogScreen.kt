@@ -65,6 +65,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.imeAnimationTarget
@@ -115,6 +116,7 @@ import io.github.tomlmbl.launcher.ui.remainingBelow
 import io.github.tomlmbl.launcher.ui.pressScale
 import io.github.tomlmbl.launcher.ui.pressedIn
 import io.github.tomlmbl.launcher.ui.rememberDot
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -187,8 +189,15 @@ fun CatalogScreen(
     val searchFocus = remember { FocusRequester() }
     var fieldFocused by remember { mutableStateOf(false) }
     val softKeyboard = LocalSoftwareKeyboardController.current
+    val imeHiding by rememberUpdatedState(
+        WindowInsets.ime.getBottom(LocalDensity.current) > 0 &&
+            WindowInsets.imeAnimationTarget.getBottom(LocalDensity.current) == 0
+    )
     LaunchedEffect(searchRequested) {
         if (searchRequested) {
+            // Search reopened while the previous keyboard is still going down: a show request in the middle of that
+            // closing can be lost, so wait for it to end (a few hundred ms at most).
+            snapshotFlow { imeHiding }.first { !it }
             searchFocus.requestFocus()
             softKeyboard?.show()
             onSearchRequestHandled()
@@ -410,11 +419,20 @@ internal fun SearchField(
 ) {
     val clear = stringResource(R.string.clear_search)
     // Keyboard closed (Back): the field gives up focus, otherwise the blinking cursor redraws the screen every
-    // 500 ms while the catalog stays open. A keyboard never seen in the insets triggers nothing.
+    // 500 ms while the catalog stays open. Only a keyboard seen opening while the field has focus counts: the end of
+    // an earlier keyboard's closing (search left, then reopened before it is down) must not take the new focus away.
     val focusManager = LocalFocusManager.current
     val keyboard = WindowInsets.isImeVisible
+    val keyboardOpening = WindowInsets.imeAnimationTarget.getBottom(LocalDensity.current) > 0
     var focused by remember { mutableStateOf(false) }
-    LaunchedEffect(keyboard) { if (!keyboard && focused) focusManager.clearFocus() }
+    var shownWhileFocused by remember { mutableStateOf(false) }
+    LaunchedEffect(keyboard, keyboardOpening, focused) {
+        when {
+            !focused -> shownWhileFocused = false
+            keyboard && keyboardOpening -> shownWhileFocused = true
+            !keyboard && shownWhileFocused -> { shownWhileFocused = false; focusManager.clearFocus() }
+        }
+    }
     BasicTextField(
         value = query,
         onValueChange = onQueryChange,
