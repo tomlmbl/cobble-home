@@ -17,32 +17,12 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.util.lerp
 
 /**
- * Whether Home, started while the keyguard is still there, arrives from an unlock. Measured on Android 16 and 17: when
- * Home starts during an unlock, the keyguard still reports itself as locked for SystemUI's exit animation (about
- * 400 ms), while an ordinary return finds it gone; the device itself may report itself locked for a few more ms. Home
- * started behind the keyguard (camera opened over it) stays locked.
- */
-enum class UnlockGate {
-    /** Not decided yet: look again at the next frame. */
-    Wait,
-    /** The device is unlocked: play the arrival. */
-    Arrive,
-    /** Still locked after [UnlockArrival.unlockWaitMs]: Home is behind the keyguard, show it as is. */
-    Show;
-
-    companion object {
-        fun of(elapsedMs: Long, deviceLocked: Boolean, spec: UnlockArrival): UnlockGate = when {
-            !deviceLocked -> Arrive
-            elapsedMs >= spec.unlockWaitMs -> Show
-            else -> Wait
-        }
-    }
-}
-
-/**
  * Arrival of Home's elements one by one after an unlock, ranked from the bottom (0) upward; each one fades in over
  * [alphaMs] and grows from [startScale] along [easing] over [durationMs], [staggerMs] after the one below it.
- * The sequence starts [startDelayMs] after Home starts, when SystemUI begins showing it.
+ * The sequence starts [startDelayMs] after Home starts, when SystemUI begins showing it. Played when Home starts while
+ * the keyguard is still there: measured on Android 16 and 17, the keyguard reports itself locked during the whole exit
+ * animation of an unlock (about 400 ms) and the device sometimes does too, while an ordinary return finds it gone.
+ * Home started behind the keyguard (camera opened over it) plays it unseen, stops, and plays it again at the unlock.
  */
 class UnlockArrival(
     val durationMs: Int,
@@ -53,8 +33,6 @@ class UnlockArrival(
     val easing: Easing,
     /** Height of the common scale center, as a fraction of the screen height, horizontally centered. */
     val pivotY: Float,
-    /** Longest wait, from Home's start, for the device to report itself unlocked. */
-    val unlockWaitMs: Long,
 ) {
     /** Progress (0 hidden, 1 in place) of the element of [rank], [elapsedMs] after the sequence starts. */
     fun progress(elapsedMs: Float, rank: Int): Float =

@@ -10,7 +10,6 @@ import android.content.IntentFilter
 import android.graphics.Color as AndroidColor
 import android.graphics.Rect
 import android.os.Bundle
-import android.os.SystemClock
 import android.util.Log
 import android.view.InputDevice
 import android.view.MotionEvent
@@ -64,7 +63,6 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.runtime.withFrameMillis
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
@@ -381,26 +379,9 @@ class HomeActivity : ComponentActivity() {
                 LaunchedEffect(arrivalRun) {
                     if (arrivalRun == 0) return@LaunchedEffect
                     val spec = Tokens.unlockArrival
-                    val startedAt = SystemClock.uptimeMillis()
                     delay(spec.startDelayMs)
-                    val keyguard = getSystemService(KeyguardManager::class.java)
-                    while (true) {
-                        // Home stopped meanwhile: the sequence was cancelled.
-                        if (arrival.value != 0f) return@LaunchedEffect
-                        val elapsed = SystemClock.uptimeMillis() - startedAt
-                        when (UnlockGate.of(elapsed, keyguard.isDeviceLocked, spec)) {
-                            UnlockGate.Wait -> withFrameMillis { }
-                            UnlockGate.Show -> {
-                                Log.i("Unlock", "still locked after ${elapsed}ms: shown")
-                                arrival.snapTo(ARRIVAL_DONE)
-                                return@LaunchedEffect
-                            }
-                            UnlockGate.Arrive -> {
-                                Log.i("Unlock", "arrival after ${elapsed}ms")
-                                break
-                            }
-                        }
-                    }
+                    // Home stopped during the delay: the sequence was cancelled.
+                    if (arrival.value != 0f) return@LaunchedEffect
                     val total = spec.totalMs(Tokens.unlockArrivalRanks)
                     arrival.animateTo(total.toFloat(), tween(total, easing = LinearEasing))
                     arrival.snapTo(ARRIVAL_DONE)
@@ -915,11 +896,12 @@ class HomeActivity : ComponentActivity() {
         // Back from an app (gesture, button, app exit) or screen wake-up: Home plays its reveal.
         revealTarget = 1f
         revealRun++
-        // Started while the keyguard is still there: an unlock, or Home behind the keyguard. Home stays hidden until the
-        // device reports itself unlocked, then its elements arrive one by one instead of the reveal; with reduced
-        // animations, Home shows at once.
-        val keyguardLocked = getSystemService(KeyguardManager::class.java).isKeyguardLocked
-        if (keyguardLocked) Log.i("Unlock", "start with keyguard")
+        // Started while the keyguard is still there: an unlock (or Home behind the keyguard, unseen). Home's elements
+        // arrive one by one instead of the reveal; with reduced animations, Home shows at once.
+        val keyguard = getSystemService(KeyguardManager::class.java)
+        val keyguardLocked = keyguard.isKeyguardLocked
+        // States only: makes the trigger checkable on devices whose keyguard timing differs.
+        if (keyguardLocked) Log.i("Unlock", "start with keyguard, deviceLocked=${keyguard.isDeviceLocked}")
         if (keyguardLocked && ValueAnimator.areAnimatorsEnabled()) {
             lifecycleScope.launch {
                 reveal.snapTo(1f)
