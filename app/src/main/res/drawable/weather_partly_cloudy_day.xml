@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Meteocons Fill "partly-cloudy-day" (basmilius/weather-icons, @meteocons/svg-static 3.0.0-next.10), Copyright (c) 2020-present Bas Milius, MIT License; converted by tools/meteocons/convert.py. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="32dp"
+    android:height="32dp"
+    android:viewportWidth="128"
+    android:viewportHeight="128">
+    <group>
+        <clip-path android:pathData="M0,0h128v128h-128z" />
+        <path
+            android:pathData="M30.5,51a8.5,8.5 0 1,0 17,0a8.5,8.5 0 1,0 -17,0z"
+            android:strokeColor="#FFF8AF18"
+            android:strokeWidth="1"
+            android:strokeMiterLimit="4">
+            <aapt:attr name="android:fillColor">
+                <gradient android:type="linear" android:startX="39" android:startY="42" android:endX="39" android:endY="60">
+                    <item android:offset="0" android:color="#FFFBBF24" />
+                    <item android:offset="1" android:color="#FFF8AF18" />
+                </gradient>
+            </aapt:attr>
+        </path>
+        <path
+            android:pathData="M37.688 31.313a1.312 1.312 0 1 1 2.624 0v6.125a1.312 1.312 0 1 1-2.624 0zM51.993 36.15a1.312 1.312 0 1 1 1.856 1.857l-4.33 4.33a1.312 1.312 0 1 1-1.857-1.855zM58.688 49.688a1.312 1.312 0 1 1 0 2.624h-6.126a1.312 1.312 0 1 1 0-2.624zM53.85 63.993a1.312 1.312 0 1 1-1.857 1.856l-4.33-4.33a1.312 1.312 0 1 1 1.855-1.857zM37.688 64.563a1.312 1.312 0 1 1 2.624 0v6.124a1.312 1.312 0 1 1-2.624 0zM28.482 59.662a1.312 1.312 0 1 1 1.856 1.856l-4.331 4.331a1.312 1.312 0 1 1-1.856-1.856zM25.438 49.688a1.312 1.312 0 1 1 0 2.624h-6.125a1.312 1.312 0 1 1 0-2.624zM30.338 40.482a1.312 1.312 0 1 1-1.856 1.856l-4.331-4.331a1.312 1.312 0 1 1 1.856-1.856z"
+            android:fillColor="#FFF8AF18" />
+        <path
+            android:pathData="M55.262 48.475c4.86-7.864 15.035-11.095 23.553-7.532 8.506 3.56 13.323 13.06 11.088 22.022l-.161.65.669-.03c7.01-.306 13.089 5.407 13.089 12.443 0 6.811-5.728 12.472-12.523 12.472H37.954c-6.826.002-12.751-5.33-13.395-12.14-.643-6.808 4.178-13.148 10.884-14.415l.483-.092-.084-.484c-.816-4.745 1.284-9.652 5.263-12.356 3.99-2.712 9.34-2.86 13.475-.373l.423.255z"
+            android:strokeColor="#FFE6EFFC"
+            android:strokeWidth="1"
+            android:strokeMiterLimit="10">
+            <aapt:attr name="android:fillColor">
+                <gradient android:type="linear" android:startX="64.001" android:startY="39" android:endX="64.001" android:endY="89">
+                    <item android:offset="0" android:color="#FFF3F7FE" />
+                    <item android:offset="1" android:color="#FFE6EFFC" />
+                </gradient>
+            </aapt:attr>
+        </path>
+    </group>
+</vector>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Meteocons Fill "rain" (basmilius/weather-icons, @meteocons/svg-static 3.0.0-next.10), Copyright (c) 2020-present Bas Milius, MIT License; converted by tools/meteocons/convert.py. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="32dp"
+    android:height="32dp"
+    android:viewportWidth="128"
+    android:viewportHeight="128">
+    <group>
+        <clip-path android:pathData="M0,0h128v128h-128z" />
+        <path
+            android:pathData="M55.262 48.475c4.86-7.864 15.035-11.095 23.553-7.532 8.506 3.56 13.323 13.06 11.088 22.022l-.161.65.669-.03c7.01-.306 13.089 5.407 13.089 12.443 0 6.811-5.728 12.472-12.523 12.472H37.954c-6.826.002-12.751-5.33-13.395-12.14-.643-6.808 4.178-13.148 10.884-14.415l.483-.092-.084-.484c-.816-4.745 1.284-9.652 5.263-12.356 3.99-2.712 9.34-2.86 13.475-.373l.423.255z"
+            android:strokeColor="#FFE6EFFC"
+            android:strokeWidth="1"
+            android:strokeMiterLimit="10">
+            <aapt:attr name="android:fillColor">
+                <gradient android:type="linear" android:startX="64.001" android:startY="39" android:endX="64.001" android:endY="89">
+                    <item android:offset="0" android:color="#FFF3F7FE" />
+                    <item android:offset="1" android:color="#FFE6EFFC" />
+                </gradient>
+            </aapt:attr>
+        </path>
+        <group android:translateX="0" android:translateY="8">
+            <path
+                android:pathData="M52 83v12"
+                android:strokeColor="#FF0A5AD4"
+                android:strokeWidth="4"
+                android:strokeLineCap="round"
+                android:strokeMiterLimit="4" />
+        </group>
+        <path
+            android:pathData="M64 83v12"
+            android:strokeColor="#FF0A5AD4"
+            android:strokeWidth="4"
+            android:strokeLineCap="round"
+            android:strokeMiterLimit="4" />
+        <group android:translateX="0" android:translateY="8">
+            <path
+                android:pathData="M76 83v12"
+                android:strokeColor="#FF0A5AD4"
+                android:strokeWidth="4"
+                android:strokeLineCap="round"
+                android:strokeMiterLimit="4" />
+        </group>
+    </group>
+</vector>

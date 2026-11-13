@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Swiping down on Home opens the notification shade. Normal permission, no dialog. -->
+    <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
+    <!-- "Uninstall" in an app menu opens the system confirmation. Normal permission. -->
+    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
+    <!-- Automatic switching: the system only gives the connected Wi-Fi name with precise location, requested together
+         with approximate location, only when "Automatic switching" is turned on, never in the background. -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- Wi-Fi connection tracking, without network name or location. Normal permission. -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- "Wi-Fi is off" in the switching settings: `WifiManager.isWifiEnabled`. Normal permission. -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
+    <!-- Weather: the only external service, Open-Meteo, no request without a city (see PRIVACY.md). Normal permission. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Next event on Home: requested only from the panel's button; the event is never stored or logged. Without it,
+         the event line does not exist. -->
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+
+    <!-- Narrowest possible app visibility: launcher activities only, no QUERY_ALL_PACKAGES. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
+    <application
+        android:name=".LauncherApplication"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Launcher">
+        <activity
+            android:name=".home.HomeActivity"
+            android:clearTaskOnLaunch="true"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboard|keyboardHidden|navigation|uiMode|density"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:resumeWhilePausing="true"
+            android:stateNotNeeded="true"
+            android:windowSoftInputMode="adjustNothing">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <!-- Settings in their own task: the Home gesture and Back shrink them above the real Home. -->
+        <activity
+            android:name=".settings.SettingsActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboard|keyboardHidden|navigation|uiMode|density"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:taskAffinity="${applicationId}.settings"
+            android:theme="@style/Theme.Launcher.Settings"
+            android:windowSoftInputMode="adjustResize" />
+    </application>
+</manifest>

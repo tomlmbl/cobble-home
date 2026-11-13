@@ -1,0 +1,23 @@
+A decluttered, context-aware home screen that respects your time and privacy.
+
+Your apps stay where you put them. Only three dock shortcuts follow your context, detected on your device. No tracking, no ads, open source.
+
+<b>A home screen that does not move</b>
+Clock, weather, your next calendar event and up to six favorite apps, in the order you chose, followed by a search line. Nothing reorders them: no ranking, no learning from your habits.
+
+<b>Every app, quickly</b>
+Type to search, or slide along the alphabet to reach a letter with one hand.
+
+<b>Profiles, if you want them</b>
+Pick none, or exactly three (for example Work, Home and Out). Each profile has a dock of three apps you choose. Only the dock changes with the profile; your favorites never do.
+
+<b>Switching you can predict</b>
+Change profile by hand at any time, or let the launcher switch when you connect to, or leave, a Wi-Fi network you saved. It never switches while you are using the screen, and automatic switching can be turned off.
+
+<b>Works with nothing granted</b>
+Without network, location or calendar access, you can still open all your apps.
+
+<b>Privacy</b>
+No account, no analytics, no advertising identifier, no crash reporting, no telemetry. Wi-Fi network names are read on the device and never sent. Weather comes from Open-Meteo, off until you choose a city: the coordinates of that city, rounded to about 1 km, are sent; your device's own position never is.
+
+Precise location is only asked if you turn on automatic switching, because Android reveals the connected Wi-Fi network name only to apps with precise location. Approximate location is only asked if you tap "Use my location" for the weather; the position itself is neither stored nor sent.

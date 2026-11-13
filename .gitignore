@@ -1,0 +1,17 @@
+# macOS (exFAT volumes create AppleDouble files)
+.DS_Store
+._*
+
+# Gradle and Android
+.gradle/
+.kotlin/
+build/
+local.properties
+*.apk
+*.aab
+*.jks
+*.keystore
+
+# IDE
+.idea/
+*.iml

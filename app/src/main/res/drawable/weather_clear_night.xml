@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Meteocons Fill "clear-night" (basmilius/weather-icons, @meteocons/svg-static 3.0.0-next.10), Copyright (c) 2020-present Bas Milius, MIT License; converted by tools/meteocons/convert.py. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="32dp"
+    android:height="32dp"
+    android:viewportWidth="128"
+    android:viewportHeight="128">
+    <path
+        android:pathData="M60.302 32.582C55.282 53.7 73.6 74.348 95.325 72.515 91.52 85.77 79.2 95.5 64.536 95.5 46.837 95.5 32.5 81.344 32.5 63.898c0-16.03 12.107-29.27 27.802-31.316"
+        android:strokeColor="#FF72B9D5"
+        android:strokeWidth="1"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeMiterLimit="4">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="64" android:startY="32" android:endX="64" android:endY="96">
+                <item android:offset="0" android:color="#FF86C3DB" />
+                <item android:offset="1" android:color="#FF72B9D5" />
+            </gradient>
+        </aapt:attr>
+    </path>
+</vector>

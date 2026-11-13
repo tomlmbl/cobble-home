@@ -1,0 +1,46 @@
+# Reproducibility check build: unsigned release on Linux, hash to compare with a local build. No secret or key
+# here. Run by hand or on a version tag (REPRODUCIBLE_BUILDS.md).
+name: Reproducible build
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  release-unsigned:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      # Same JDK as local builds (Zulu 21.0.13, gradle/gradle-daemon-jvm.properties).
+      - uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: "21.0.13"
+
+      - name: Android SDK
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37.0" "build-tools;36.0.0" > /dev/null
+
+      - name: Build
+        run: ./gradlew --no-daemon :app:assembleRelease
+
+      - name: SHA-256
+        run: |
+          cd app/build/outputs/apk/release
+          sha256sum app-release-unsigned.apk | tee sha256.txt
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          cat sha256.txt >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-release-unsigned
+          path: |
+            app/build/outputs/apk/release/app-release-unsigned.apk
+            app/build/outputs/apk/release/sha256.txt
+          retention-days: 30

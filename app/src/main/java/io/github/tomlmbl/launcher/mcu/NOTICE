@@ -1,0 +1,6 @@
+Sources taken from material-color-utilities (Google LLC), Apache-2.0 license (LICENSE file alongside).
+Origin: https://github.com/material-foundation/material-color-utilities, java/ directory,
+commit dd62982dfdefdfc9232ce8d76e122fb1c6d188ae (2026-10-15), retrieved on 2026-10-25.
+Files: hct/Cam16, hct/Hct, hct/HctSolver, hct/ViewingConditions, utils/ColorUtils, utils/MathUtils, blend/Blend.
+Modifications: packages `hct`, `utils`, `blend` renamed under `io.github.tomlmbl.launcher.mcu`, imports adjusted.
+No other modification. Used for: app dot colors, `apps/DotColor.kt`.
