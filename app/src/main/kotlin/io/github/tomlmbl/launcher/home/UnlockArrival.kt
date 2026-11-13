@@ -11,6 +11,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.findRootCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.util.lerp
@@ -83,7 +84,11 @@ internal fun Modifier.arrive(spec: UnlockArrival, progress: () -> Float): Modifi
         val root = coordinates.findRootCoordinates()
         pivot = coordinates.localPositionOf(root, Offset(root.size.width / 2f, root.size.height * spec.pivotY))
     }
-        .graphicsLayer { alpha = (progress() * spec.durationMs / spec.alphaMs).coerceIn(0f, 1f) }
+        .graphicsLayer {
+            alpha = (progress() * spec.durationMs / spec.alphaMs).coerceIn(0f, 1f)
+            // No offscreen buffer: it would be sized to the element and clip it while it is drawn away from its place.
+            compositingStrategy = CompositingStrategy.ModulateAlpha
+        }
         .drawWithContent {
             val p = progress()
             if (p >= 1f) drawContent()
