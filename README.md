@@ -12,7 +12,7 @@ No tracking, no ads, free and open source.</p>
 > **Status:** not released yet. The first public beta will be an APK on GitHub, then on F-Droid.
 
 <p align="center">
-  <img src=".github/assets/screenshots.png" alt="Screenshots: home screen, all apps, weather and agenda, dock slot, settings">
+  <img src=".github/assets/screenshots.png" width="640" alt="Screenshots: home screen, all apps, weather and agenda, dock slot, settings">
 </p>
 
 ## Features
@@ -41,13 +41,14 @@ screen. Automatic switching can be turned off.
 
 No account, analytics, advertising ID, crash reporting or telemetry. Data stays in the app's private storage.
 
-| Permission | Used for | Asked |
-|---|---|---|
-| Location (precise) | Android only gives the name of the connected Wi-Fi to apps with this permission. Used to recognize saved networks; names never leave the phone. | When you turn on automatic switching |
-| Location (approximate) | *Use my location* for the weather: picks the nearest city from a built-in list. Your position is not stored or sent. | When you tap *Use my location* |
-| Calendar | Shows your next event. Events are not stored. | When you tap the calendar button in the panel |
-| Internet | Weather from [Open-Meteo](https://open-meteo.com/), off until you pick a city. | At install |
-| Network and Wi-Fi state, expand status bar, request uninstall | Wi-Fi connection changes, notification shade, *Uninstall* in an app's menu. | At install |
+- **Location (precise):** Android only gives the name of the connected Wi-Fi to apps with this permission. Used to
+  recognize saved networks; names never leave the phone. Asked when you turn on automatic switching.
+- **Location (approximate):** *Use my location* for the weather picks the nearest city from a built-in list. Your
+  position is not stored or sent. Asked when you tap *Use my location*.
+- **Calendar:** shows your next event. Events are not stored. Asked when you tap the calendar button in the panel.
+- **Internet:** weather from [Open-Meteo](https://open-meteo.com/), off until you pick a city. Granted at install.
+- **Network and Wi-Fi state, expand status bar, request uninstall:** Wi-Fi connection changes, notification shade,
+  *Uninstall* in an app's menu. Granted at install.
 
 Refusing a permission only disables the feature that needs it. Details and data sent to Open-Meteo:
 [PRIVACY.md](PRIVACY.md).

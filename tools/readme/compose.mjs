@@ -1,6 +1,7 @@
 // README screenshots image: node tools/readme/compose.mjs
-// The five store screenshots in a row, rounded corners and gray captions, on a transparent background (legible in
-// light and dark themes), rendered by headless Chrome. Output: .github/assets/screenshots.png.
+// The five store screenshots on two rows of equal width (2 larger ones, then 3), rounded corners and gray captions, on a transparent
+// background (legible in light and dark themes), rendered by headless Chrome. Two rows keep the screens and captions
+// legible once GitHub scales the image down to a phone's width. Output: .github/assets/screenshots.png.
 import { writeFileSync, mkdtempSync } from 'fs';
 import { execFileSync } from 'child_process';
 import { tmpdir } from 'os';
@@ -18,16 +19,24 @@ const SCREENS = [
   ['4_dock_slot.png', 'Dock slot'],
   ['5_settings.png', 'Settings'],
 ];
-const W = 270, H = Math.round(W * 2412 / 1080), GAP = 28, PAD = 24, LABEL = 44;
-const width = PAD * 2 + SCREENS.length * W + (SCREENS.length - 1) * GAP, height = PAD * 2 + H + LABEL;
+const ROWS = [SCREENS.slice(0, 2), SCREENS.slice(2)];
+// Captions are sized for a ~370 px wide phone rendering, where the image is scaled to about 40 %.
+const W = 270, GAP = 28, PAD = 24, LABEL = 56, ROW_GAP = 28;
+// Every row spans the width of the widest one: fewer screens means larger screens.
+const inner = Math.max(...ROWS.map(r => r.length)) * (W + GAP) - GAP;
+const size = r => { const w = (inner - (r.length - 1) * GAP) / r.length; return [w, Math.round(w * 2412 / 1080)]; };
+const width = PAD * 2 + inner;
+const height = PAD * 2 + ROWS.reduce((h, r) => h + size(r)[1] + LABEL, 0) + (ROWS.length - 1) * ROW_GAP;
 
 const page = `<!doctype html><meta charset="utf-8"><style>
 html, body { margin: 0; background: transparent; }
-.row { display: flex; gap: ${GAP}px; padding: ${PAD}px; }
-figure { margin: 0; width: ${W}px; }
-img { display: block; width: ${W}px; height: ${H}px; border-radius: 26px; box-shadow: 0 0 0 1px rgba(128,128,128,.35), 0 6px 18px rgba(0,0,0,.18); }
-figcaption { margin-top: 16px; text-align: center; font: 500 17px/1.2 -apple-system, "Helvetica Neue", Arial, sans-serif; color: #8a8a8f; }
-</style><div class="row">${SCREENS.map(([f, l]) => `<figure><img src="file://${shots}${f}"><figcaption>${l}</figcaption></figure>`).join('')}</div>`;
+.grid { display: flex; flex-direction: column; gap: ${ROW_GAP}px; padding: ${PAD}px; }
+.row { display: flex; justify-content: center; gap: ${GAP}px; }
+figure { margin: 0; }
+img { display: block; border-radius: 26px; box-shadow: 0 0 0 1px rgba(128,128,128,.35), 0 6px 18px rgba(0,0,0,.18); }
+figcaption { margin-top: 18px; text-align: center; white-space: nowrap; font: 500 24px/1.2 -apple-system, "Helvetica Neue", Arial, sans-serif; color: #8a8a8f; }
+</style><div class="grid">${ROWS.map(r => `<div class="row">${r.map(([f, l]) =>
+  `<figure style="width: ${size(r)[0]}px"><img style="width: ${size(r)[0]}px; height: ${size(r)[1]}px" src="file://${shots}${f}"><figcaption>${l}</figcaption></figure>`).join('')}</div>`).join('')}</div>`;
 const dir = mkdtempSync(join(tmpdir(), 'cobble-readme-'));
 writeFileSync(join(dir, 'page.html'), page);
 execFileSync(CHROME, ['--headless=new', '--disable-gpu', '--hide-scrollbars', '--force-device-scale-factor=2',
