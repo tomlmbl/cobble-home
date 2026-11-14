@@ -9,7 +9,7 @@
 <p align="center">An Android launcher with a fixed list of favorites and a three-app dock that follows your context.<br>
 No tracking, free and open source.</p>
 
-> **Status:** not released yet. The first public beta will be an APK on GitHub, then on F-Droid.
+> **Download:** [Cobble Home 1.0.0 (beta)](https://github.com/tomlmbl/cobble-home/releases/tag/v1.0.0) — APK for Android 15+.
 
 <p align="center">
   <img src=".github/assets/screenshots.png" width="640" alt="Screenshots: home screen, all apps, weather and agenda, dock slot, settings">
