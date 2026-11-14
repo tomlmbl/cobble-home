@@ -924,9 +924,19 @@ class HomeActivity : ComponentActivity() {
 
     /** Opens [app]; Home fades out behind it without delaying the launch. */
     private fun launchApp(app: App, bounds: Rect?) {
-        launcher.apps.launch(app, bounds)
+        if (!launcher.apps.launch(app, bounds)) return
         revealTarget = 0f
         revealRun++
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Launch abandoned without Home being stopped (app failing at start, launch cancelled): Home was fading out
+        // and nothing else brings it back.
+        if (revealTarget < 1f) {
+            revealTarget = 1f
+            revealRun++
+        }
     }
 
     override fun onStop() {
@@ -984,6 +994,14 @@ class HomeActivity : ComponentActivity() {
         super.onNewIntent(intent)
         // Home button or gesture while Home is already displayed.
         if (intent.hasCategory(Intent.CATEGORY_HOME)) reset()
+        if (intent.hasCategory(Intent.CATEGORY_HOME) || GestureReturn.isGesture(intent)) {
+            // Home asked for while an app is still opening (cold start): Home was never stopped, so onStart did not
+            // reset the target; the fade-out toward the app would otherwise go on, leaving an empty Home.
+            if (revealTarget < 1f) {
+                revealTarget = 1f
+                revealRun++
+            }
+        }
         // Gesture return from an app: animation toward its dot or icon, and Home reveal like the Pixel launcher, as
         // soon as the gesture ends. Center set before replying: the target is often reported during answer().
         if (reveal.value < 1f && GestureReturn.isGesture(intent)) {

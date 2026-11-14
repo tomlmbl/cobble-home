@@ -291,14 +291,15 @@ class AppRepository(private val context: Context) {
     fun idOf(component: ComponentName, user: UserHandle): String =
         "${userManager.getSerialNumberForUser(user)}|${component.flattenToShortString()}"
 
-    fun launch(app: App, sourceBounds: Rect?) {
-        try {
-            launcherApps.startMainActivity(app.component, app.user, sourceBounds, null)
-        } catch (e: RuntimeException) {
-            // App uninstalled or disabled between display and tap: the list is about to reload.
-            Log.w(TAG, "launch failed: ${e.javaClass.simpleName}")
-            reload()
-        }
+    /** Opens [app]; false if the system refused (Home then stays in place). */
+    fun launch(app: App, sourceBounds: Rect?): Boolean = try {
+        launcherApps.startMainActivity(app.component, app.user, sourceBounds, null)
+        true
+    } catch (e: RuntimeException) {
+        // App uninstalled or disabled between display and tap: the list is about to reload.
+        Log.w(TAG, "launch failed: ${e.javaClass.simpleName}")
+        reload()
+        false
     }
 
     /** The system "App info" screen. */
