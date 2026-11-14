@@ -6,8 +6,8 @@
 
 <p align="center"><b>A decluttered, context-aware home screen that respects your time and privacy.</b></p>
 
-<p align="center">Android launcher. Favorites keep their place; only a three-app dock changes with your profile.<br>
-No tracking, no ads, free and open source.</p>
+<p align="center">An Android launcher with a fixed list of favorites and a three-app dock that follows your context.<br>
+No tracking, free and open source.</p>
 
 > **Status:** not released yet. The first public beta will be an APK on GitHub, then on F-Droid.
 
@@ -29,10 +29,12 @@ All apps remain reachable without network and without any optional permission.
 
 ## How profiles work
 
+<p align="center">
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset=".github/assets/switching-dark.svg">
   <img src=".github/assets/switching-light.svg" alt="Three home screens: on one Wi-Fi network the Work profile, on another the Home profile, without Wi-Fi the Out profile. The favorites are identical; only the three dock apps differ.">
 </picture>
+</p>
 
 Profiles change by hand, or automatically when you join or leave a saved Wi-Fi network, never while you are using the
 screen. Automatic switching can be turned off.

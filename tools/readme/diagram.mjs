@@ -90,7 +90,7 @@ function svg(t) {
   const legend = `<text x="${W / 2}" y="${LEGEND_Y}" class="t"><tspan font-weight="600">Favorites</tspan> always the same · <tspan font-weight="600" fill="${t.chipText}">Dock</tspan> follows the Wi-Fi</text>`;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Same favorites in every profile; only the dock changes with the Wi-Fi network">
 <defs><linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34305A"/><stop offset=".38" stop-color="#4B3529"/><stop offset=".62" stop-color="#262722"/><stop offset="1" stop-color="#0B0B0C"/></linearGradient></defs>
-<style>text { font-family: ${FONT}; } .t { font-size: 22px; fill: ${t.text}; text-anchor: middle; } .pill { font-size: 17px; fill: #fff; text-anchor: middle; } .chip { font-size: 20px; font-weight: 600; fill: ${t.chipText}; text-anchor: middle; } .clock { font-family: Georgia, 'Times New Roman', serif; font-size: 30px; fill: #fff; }</style>
+<style>text { font-family: ${FONT}; } .t { font-size: 22px; fill: ${t.text}; text-anchor: middle; } .pill { font-size: 17px; fill: #fff; text-anchor: middle; } .chip { font-size: 20px; font-weight: 600; fill: ${t.chipText}; text-anchor: middle; } .clock { font-size: 30px; fill: #fff; }</style>
 ${PROFILES.map((p, i) => phone(p, LEFT + i * (PW + GAP), t)).join('\n')}
 ${legend}
 </svg>
